@@ -10,7 +10,6 @@ void SerialHandler::serialWelcome(SDcardHandler &SDcard){
   if (serial_) {
     commands(SDcard);
     if(SDcard.available()) SDcard.loadParam(&newChecks_, &newLimit_, &newFlow_);
-    serialCountdown(START_COUNT);                       // Nos deja un tiempo para ver los posibles comandos
   } else Serial.end();
   if (!SDcard.available()){
     Sprintln("Default parameters were loaded:");
@@ -33,18 +32,6 @@ void SerialHandler::commands(SDcardHandler &SDcard){
     }
 }
 
-void SerialHandler::serialCountdown(int timer) {        // Función que nos visualiza una cuenta atrás del tiempo que queda para enviar un dato y modificarlo
-  Sprint("\nStarting controller... ");
-  Serial.flush();                                       // Para quitar cualquier dato que hubiera quedado acumulado de un envío anterior inintencionado
-  for (int i = timer; i >= 1; i--) {                    // Bucle de cuenta atrás
-    Serial.print(i);
-    Sprint("  ");
-    delay(1000);
-    if (Serial.available()) break;                      // Si se ha enviado algo ya, dejar de contar
-  }
-  Sprintln("\n");
-}
-
 void SerialHandler::serialWatchDog(SDcardHandler &SDcard){   // Función que permite actualizar los parámetros de los sensores
   if (Serial.available()){                              // Si hemos enviado algo, significa que queremos cabiar algún parámetro
     String command = Serial.readString();
@@ -56,7 +43,9 @@ void SerialHandler::serialWatchDog(SDcardHandler &SDcard){   // Función que per
     else if (command.equalsIgnoreCase("LOGFREQ") && SDcard.available()) updateFreq(SDcard);
     else if (command.equalsIgnoreCase("RESET") && SDcard.available())resetLog(SDcard);
     else {
-      Sprintln("Error, command not available!");
+      Sprint("Error, command \"");
+      Serial.print(command);
+      Sprintln("\" not available!");
       commands(SDcard);
     }
   }

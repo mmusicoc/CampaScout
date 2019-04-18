@@ -98,7 +98,7 @@ void SDcardHandler::saveParam(int checks, int limit, int flow){
     paramFile_.print(F(", "));
     paramFile_.print(limit);
     paramFile_.print(F(", "));
-    paramFile_.println(flow);
+    paramFile_.print(flow);
     paramFile_.print(F(", "));
     paramFile_.println(RTClock.getFreq());
     paramFile_.close();
