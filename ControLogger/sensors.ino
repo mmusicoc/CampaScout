@@ -2,6 +2,7 @@
 // WATER LEVEL SENSOR ****************************************************************************************************************************
 
 bool getSensorMin(){
+  FCN
   int i;
   int valido = 0;
   int measure;
@@ -15,6 +16,7 @@ bool getSensorMin(){
 }
 
 bool getSensorMax(){
+  FCN
   int i;
   int valido = 0;
   int measure;
@@ -28,9 +30,11 @@ bool getSensorMax(){
 }
 
 void getSensors(){
+  FCN
   bool a = getSensorMin();
   bool b = getSensorMax();
   if (!a) waterLevel = underMin;
   else if(b) waterLevel = overMax;
   else waterLevel = midLevel;
 }
+

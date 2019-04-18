@@ -5,7 +5,7 @@ void controlCore(bool mode){                          // Switch Mode 1 = Auto; 0
   static int coreLoop, saveLoop;
 
   // Control de la bomba
-  
+  FCN
   if (coreLoop == CORE_LOOP) {
     coreLoop = 0;
     if (mode){
@@ -35,6 +35,7 @@ void controlCore(bool mode){                          // Switch Mode 1 = Auto; 0
 }
 
 void updateCore(){
+  FCN
   static unsigned long actualRuntime, lastRuntime = millis(); // Si este valor se asigna en cada llamada, hacer variable global e inicializar en setup()
   float timeIncrease;
   actualRuntime = millis();
@@ -43,24 +44,26 @@ void updateCore(){
   dailyRuntime += timeIncrease;
   if (pumpStatus){
     today.activeTime += timeIncrease;
-    today.litres += timeIncrease / 60000 * flow;
-    totalLitres += timeIncrease / 60000 * flow;
+    today.litres += timeIncrease / 60 * flow;
+    totalLitres += timeIncrease / 60 * flow;
   }
 }
 
 void pumpON(){
+  FCN
   digitalWrite(RELE, LOW);
   updateCore();
   saveDataEEPROM;
   pumpStatus = true;
-  updateMainLog("Level was LOW", "Pump switched ON");
+  updateMainLog("LOW -> Pump ON");
 }
 
 void pumpOFF(){
+  FCN
   digitalWrite(RELE, HIGH);
   updateCore();
   saveDataEEPROM();
   pumpStatus = false;
-  updateMainLog("Level was HIGH", "Pump switched OFF");
+  updateMainLog("HIGH -> Pump OFF");
 }
 

@@ -2,6 +2,7 @@
 // SWITCHES HANDLER ****************************************************************************************************************************
 
 void checkSwitchMode(){
+  FCN
   static int coreLoop;
   if (coreLoop == CORE_LOOP) {
     int valido = 0;
@@ -17,6 +18,7 @@ void checkSwitchMode(){
 }
 
 void checkSwitchPump(){
+  FCN
   int valido = 0;
   for (int i = 0; i < 4; i++) {
     if (digitalRead(SWITCH_MODE) == HIGH) valido++;
@@ -30,22 +32,26 @@ void checkSwitchPump(){
 // ENCODER HANDLER ****************************************************************************************************************************
 
 void pushEncoder(){
+  FCN
   buttonWasPressed = true;
   delayMicroseconds(50);
 }
 
 void rotateEncoder(){
+  FCN
   static unsigned long lastInterruptTime = 0;
   unsigned long interruptTime = millis();
-  if (interruptTime - lastInterruptTime > 5) {
+  if (interruptTime - lastInterruptTime > 2) {
     if (digitalRead(ENCODER_B) == LOW) rotationEncoder--;
     else rotationEncoder++;
-    rotationEncoder = constrain(rotationEncoder, -5, +5);
+    rotationEncoder = constrain(rotationEncoder, -1, +1);
     lastInterruptTime = interruptTime;
+    checkInteractionGUI();
   }
 }
 
 void checkInteractionGUI(){
+  FCN
   if(buttonWasPressed == true){
     timeLastAction = millis();
     actionPress();
@@ -53,12 +59,24 @@ void checkInteractionGUI(){
   }
   if (rotationEncoder != 0){
     timeLastAction = millis();
-    if (window == mainM || window == configM || window == resetM) navigateMenu();
-    else if (window == viewD) scrollData();
-    else if (window == configFlow) updateFlow();
-    else if (window == configCond) updateConductivity();
-    else if (window == configComp) updateComprobations();
+    actionRotation();
+    rotationEncoder = 0;
   }
   delay(50);
+}
+
+bool countDownSleep(){
+  FCN
+  DEBUG(timeLastAction);
+  if (dailyRuntime - timeLastAction > SLEEP_TIMEOUT) {
+    DEBUG(window);
+    if (window == mainW) {}//oledOFF()
+    else {
+      mainWindow();
+      timeLastAction = millis();
+    }
+    return 1;
+  }
+  return 0;
 }
 
