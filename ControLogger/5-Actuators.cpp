@@ -9,33 +9,28 @@ void LEDsClass::init(){
   }
 }
 
+void LEDsClass::updateLEDs(SwitchesClass &Switches, WaterLevelSensor &WaterLS, PumpClass &Pump) {
+  if (Switches.getSwitch(1)) {
+    for (byte i = 0; i < 3; i++) {
+      digitalWrite(LEDpins_[4], HIGH);
+      digitalWrite(LEDpins_[i], i == WaterLS.getWaterLevel());
+    }
+    if (Pump.getPump()) LEDblink(LEDpins_[3]);
+    else digitalWrite(LEDpins_[3], LOW);
+  }
+  else {
+    digitalWrite(LEDpins_[4], LOW);
+    if (Switches.getSwitch(2)) digitalWrite(LEDpins_[3], HIGH);
+    else digitalWrite(LEDpins_[3], LOW);
+  }
+}
+
 void LEDsClass::LEDblink(uint8_t LEDpin){
   static unsigned long prevTime = 0;
   unsigned int diff = millis() - prevTime;
   if (diff > LED_BLINK) {
     digitalWrite(LEDpin, !digitalRead(LEDpin));
     prevTime += diff;
-  }
-}
-
-void LEDsClass::updateLEDs(SwitchesClass &Switches, WaterLevelSensor &WaterLS, PumpClass &Pump) {
-  if (Switches.getSwitch(3)){
-    if (Switches.getSwitch(1)) {
-      for (byte i = 0; i < 3; i++) {
-        digitalWrite(LEDpins_[4], HIGH);
-        digitalWrite(LEDpins_[i], i == WaterLS.getWaterLevel());
-      }
-      if (Pump.getPump()) LEDblink(LEDpins_[3]);
-      else digitalWrite(LEDpins_[3], LOW);
-    }
-    else {
-      digitalWrite(LEDpins_[4], LOW);
-      if (Switches.getSwitch(2)) digitalWrite(LEDpins_[3], HIGH);
-      else digitalWrite(LEDpins_[3], LOW);
-    }
-  }
-  else {
-    for (byte i = 0; i < LED_COUNT; i++) digitalWrite(LEDpins_[i], LOW);
   }
 }
 

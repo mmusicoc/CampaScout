@@ -21,7 +21,6 @@ class SerialHandler {
     int newLimit_;
     int newFlow_;
     void commands(SDcardHandler &SDcard);
-    void serialCountdown(int timer);
     void updateChecks();
     void updateLimits();
     void updateFlow();

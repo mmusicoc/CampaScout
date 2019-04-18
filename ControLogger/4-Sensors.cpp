@@ -42,7 +42,7 @@ void SwitchesClass::init() {
 }
 
 void SwitchesClass::updateSwitches() {
-  static bool switchesPrev[SWITCH_COUNT] = {0, 0, 0};
+  static bool switchesPrev[SWITCH_COUNT] = {0, 0};
   for (byte i = 0; i < SWITCH_COUNT; i++) {
     switchesPrev[i] = switches_[i];
     switches_[i] = !sensorUpdate(switchPins_[i], sensorChecks_);
