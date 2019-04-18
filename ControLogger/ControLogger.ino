@@ -2,33 +2,37 @@
 #include "EEPROM.h"
 
 //PIN IDs
-#define SENSOR_5V A5
-#define SENSOR_MIN A4
-#define SENSOR_MAX A3
-#define RELE A7
+#define SENSOR_5V A7
+#define SENSOR_MIN A6
+#define SENSOR_MAX A1
+#define RELE_5V 3
+#define RELE 4
 
 //EEPROM PATHS
-#define MEM_DATE 0                                  //int
-#define MEM_TOTALLITRES sizeof(int)                 //float
-#define MEM_FLOW MEM_TOTALLITRES + sizeof(float)    //float
-#define MEM_LIMIT_MIN MEM_FLOW + sizeof (float)     //int
-#define MEM_LIMIT_MAX MEM_LIMIT_MIN + sizeof (int)  //int
-#define MEM_DAILYRUNTIME MEM_LIMIT_MAX + sizeof(int)//unsigned long
-#define MEM_DAILYCOUNTER MEM_DAILYRUNTIME + sizeof(unsigned long) - sizeof(struct day) + sizeof(struct day) * 
+#define MEM_DATE 0                                                  //int
+#define MEM_DAILYRUNTIME MEM_DATE + sizeof(int)                     //unsigned long
+#define MEM_TOTALLITRES MEM_DAILYRUNTIME + sizeof(unsigned long)    //float
+#define MEM_FLOW MEM_TOTALLITRES + sizeof(float)                    //float
+#define MEM_LIMIT_MIN MEM_FLOW + sizeof (float)                     //int
+#define MEM_LIMIT_MAX MEM_LIMIT_MIN + sizeof (int)                  //int
+#define MEM_CONTROL_MIN MEM_LIMIT_MAX + sizeof (int)                //int
+#define MEM_CONTROL_MAX MEM_CONTROL_MIN + sizeof (int)              //int
+#define MEM_DEBUG_DISPLAY MEM_CONTROL_MAX +sizeof(int)              //bool
+#define MEM_DAILYCOUNTER MEM_DEBUG_DISPLAY + sizeof(bool) - sizeof(struct day) + sizeof(struct day) * 
 
 //PARAMETERS 36000000
 #define CONFIGURE_TIMEOUT 15000
 #define MIN_DAILYRUNTIME 36000000
-#define SAVE_LOOP 500000
-#define DEBUG_LOOP 2000
-#define CONTROL 10
+#define SAVE_LOOP 100000
+#define DEBUG_LOOP 1000
+#define SEND_DELAY 1
 
 struct day{
   unsigned long activeTime;
   float litres;
 };
-bool pumpStatus, underMin, overMax, midLevel;
-int date, aproxTotalLitres, limitMin, limitMax;
+bool pumpStatus, debugDisplay, underMin, overMax, midLevel;
+int date, aproxTotalLitres, limitMin, limitMax, controlMin, controlMax;
 unsigned long lastActiveTime, actualActiveTime;
 unsigned long dailyRuntime, lastRuntime, actualRuntime;
 unsigned long saveLoopCounter, debugLoopCounter;
@@ -44,11 +48,11 @@ void saveData(){
   Serial.print(dailyRuntime/3600000);
   Serial.print("h");
   Serial.print((dailyRuntime%3600000)/60000);
-  Serial.print("min\tON: ");
+  Serial.print("min  ON: ");
   Serial.print(today.activeTime/3600000);
   Serial.print("h");
   Serial.print((today.activeTime%3600000)/60000);
-  Serial.print("min\tUsed: ");
+  Serial.print("min  Used: ");
   Serial.print(today.litres);
   Serial.println(" L");
   Serial.println("***************************");
@@ -58,13 +62,17 @@ void saveData(){
 
 void loadData(){
   EEPROM.get(MEM_DATE, date);
+  EEPROM.get(MEM_DAILYRUNTIME, dailyRuntime);
   EEPROM.get(MEM_TOTALLITRES, totalLitres);
   EEPROM.get(MEM_FLOW, flow);
   EEPROM.get(MEM_LIMIT_MIN, limitMin);
   EEPROM.get(MEM_LIMIT_MAX, limitMax);
-  EEPROM.get(MEM_DAILYRUNTIME, dailyRuntime);
-  delayMicroseconds(100);
+  EEPROM.get(MEM_CONTROL_MIN, controlMin);
+  EEPROM.get(MEM_CONTROL_MAX, controlMax);
+  EEPROM.get(MEM_DEBUG_DISPLAY, debugDisplay);
+  delay(500);
   Serial.println("Data loaded");
+  delay(500);
   if (dailyRuntime > MIN_DAILYRUNTIME){
     date++;
     EEPROM.put(MEM_DATE, date);
@@ -72,12 +80,10 @@ void loadData(){
     today.activeTime=0;
     today.litres=0;
     saveData();
-    delayMicroseconds(100);
     Serial.println("New day started");
   }
   else {
     EEPROM.get(MEM_DAILYCOUNTER date, today);
-    delayMicroseconds(100);
     Serial.println("Still in previous date");
   }
 }
@@ -86,50 +92,44 @@ void showData(){
   int i;
   struct day show;
   aproxTotalLitres=(int)totalLitres;
-  delayMicroseconds(100);
   Serial.print("Total saved days: ");
   Serial.println(date);
-  delayMicroseconds(100);
   Serial.print("Total consumed water: ");
   Serial.println(aproxTotalLitres);
-  delayMicroseconds(100);
+  delay(500);
   Serial.print("Saved average flow: ");
   Serial.println(flow);
-  delayMicroseconds(100);
   Serial.print("Saved conductivities: MIN ");
   Serial.print(limitMin);
   Serial.print(", MAX ");
   Serial.println(limitMax);
-  delayMicroseconds(100);
+  Serial.print("Saved comprobation loops: MIN ");
+  Serial.print(controlMin);
+  Serial.print(", MAX ");
+  Serial.println(controlMax);
+  delay(500);
   Serial.print("Actual daily runtime: ");
   Serial.print(dailyRuntime/3600000);
   Serial.print("h");
   Serial.print((dailyRuntime%3600000)/60000);
   Serial.println("min");
-  delayMicroseconds(100);
   Serial.println("\n***************************");
   Serial.println("Daily activity:");
   Serial.println("***************************\n");
   for(i=1; i<=date; i++){
+    delay(500);
     EEPROM.get(MEM_DAILYCOUNTER i, show);
-    delayMicroseconds(100);
     Serial.print("Day ");
     Serial.print(i);
-    delayMicroseconds(100);
     Serial.print(",\tActive time: ");
     Serial.print(show.activeTime/3600000);
     Serial.print("h");
     Serial.print((show.activeTime%3600000)/60000);
     Serial.print("min\tWater consumption: ");
-    delayMicroseconds(100);
     Serial.print(show.litres);
     Serial.println(" L");
   }
-  delayMicroseconds(100);
   Serial.println("\n***************************\n");
-  lastRuntime=millis();
-  Serial.print("Counter is running on day ");
-  Serial.println(date);
 }
 
 void resetCounter(){
@@ -140,9 +140,17 @@ void resetCounter(){
   today.litres=0;
   EEPROM.put(MEM_DATE, date);
   EEPROM.put(MEM_DAILYRUNTIME, dailyRuntime);
+  EEPROM.get(MEM_DAILYRUNTIME, dailyRuntime);
   EEPROM.put(MEM_TOTALLITRES, totalLitres);
-  Serial.print("Database was reset except flow variable, which is ");
-  Serial.println(flow);
+  EEPROM.put(MEM_DAILYCOUNTER date, today);
+  Serial.println("Database was reset");
+}
+
+void updateDebug(){
+  debugDisplay = Serial.parseFloat();
+  EEPROM.put(MEM_DEBUG_DISPLAY, debugDisplay);
+  if(debugDisplay) Serial.println("Debugging has been enabled");
+  else Serial.println("Debugging has been disabled");
 }
 
 void updateFlow(){
@@ -163,22 +171,37 @@ void updateConductivity(){
   Serial.print(limitMax);
 }
 
+void updateComprobations(){
+  controlMin = Serial.parseFloat();
+  controlMax = Serial.parseFloat();
+  EEPROM.put(MEM_CONTROL_MIN, controlMin);
+  EEPROM.put(MEM_CONTROL_MAX, controlMax);
+  Serial.print("Limit comprobation loops have been updated to: MIN ");
+  Serial.print(controlMin);
+  Serial.print(", MAX ");
+  Serial.print(controlMax);
+}
+
 void serialUpdate(){
   String command;
   int configDelay=0;
-  showData();
+  delay(500);
   Serial.println("Available configuration commands:");
   Serial.println("\"RESET 0\" erases all counters, setting day as 1");
+  Serial.println("\"DEBUG [1] or [0]\" enables or disables debugging");
   Serial.println("\"FLOW [L/min, decimals admitted]\" enables water flow update");
   Serial.println("\"COND [MIN] [MAX]\" enables water conductivity update");
+  Serial.println("\"COMP [MIN] [MAX]\" enables comprobation loops update");
   do{
     Serial.setTimeout(CONFIGURE_TIMEOUT/10.0);
     command = Serial.readStringUntil(' ');
     configDelay++;
   } while (command.equalsIgnoreCase("") && configDelay < 10);
   if (command.equalsIgnoreCase("RESET")) resetCounter();
+  else if (command.equalsIgnoreCase("DEBUG")) updateDebug();
   else if (command.equalsIgnoreCase("FLOW")) updateFlow();
   else if (command.equalsIgnoreCase("COND")) updateConductivity();
+  else if (command.equalsIgnoreCase("COMP")) updateComprobations();
   else Serial.println("Nothing was changed. Counter is initializing...");
   Serial.print("\n");
 }
@@ -188,12 +211,12 @@ void serialUpdate(){
 bool getSensorMin(){
   int i;
   int valido=0;
-  int measure = analogRead(SENSOR_MAX);
-  for (i=0; i<CONTROL; i++){
-    if (measure<=limitMin)valido++;
-    delayMicroseconds(50);
+  int measure = analogRead(SENSOR_MIN);
+  for (i=0; i<controlMin; i++){
+    if (measure>=limitMin)valido++;
+    delayMicroseconds(200);
   }
-  if (valido==CONTROL) return 1;
+  if (valido==controlMin) return 1;
   else return 0;
 }
 
@@ -201,35 +224,38 @@ bool getSensorMax(){
   int i;
   int valido=0;
   int measure = analogRead(SENSOR_MAX);
-  for (i=0; i<CONTROL; i++){
+  for (i=0; i<controlMax; i++){
     if (measure>=limitMax)valido++;
-    delayMicroseconds(50);
+    delayMicroseconds(200);
   }
-  if (valido==CONTROL) return 1;
+  if (valido==controlMax) return 1;
   else return 0;
 }
 
 void getSensors(){
-  if (getSensorMin()){
-    if (getSensorMax()) {
-      overMax = true;
-      midLevel = false;
-      underMin = false;
-    }
-    else{
-      overMax = false;
-      midLevel = true;
-      underMin = false;
-    }
-  } else{
+  bool a=getSensorMin();
+  bool b=getSensorMax();
+  if (!a){
     overMax = false;
     midLevel = false;
     underMin = true;
+  }
+  else if(b){
+    overMax = true;
+    midLevel = false;
+    underMin = false;
+  }
+  else{
+    overMax = false;
+    midLevel = true;
+    underMin = false;
   }
 }
 
 void updateData(){
   actualRuntime = millis();
+  dailyRuntime+=(actualRuntime-lastRuntime);
+  lastRuntime=actualRuntime;
   if (pumpStatus){
     actualActiveTime = actualRuntime;
     today.activeTime+=(actualActiveTime-lastActiveTime);
@@ -238,23 +264,23 @@ void updateData(){
     lastActiveTime=actualActiveTime;
   }
   else lastActiveTime = actualRuntime;
-  dailyRuntime+=(actualRuntime-lastRuntime);
-  lastRuntime=actualRuntime;
-  if(!(saveLoopCounter%SAVE_LOOP))saveData();
-  saveLoopCounter++;
+  saveData();
 }
 
 void pumpON(){
-  digitalWrite(RELE, LOW);
+  analogWrite(RELE, 0);
+  updateData();
   pumpStatus=true;
   Serial.println("\nPump switched ON\n");
+  delay(1000);
 }
 
 void pumpOFF(){
-  digitalWrite(RELE, HIGH);
+  analogWrite(RELE, 1023);
+  updateData();
   pumpStatus=false;
   Serial.println("\nPump switched OFF\n");
-  //saveData();
+  delay(1000);
 }
 
 void automatic(){
@@ -265,18 +291,19 @@ void automatic(){
 }
 
 void serialDebug(){
-  if (!(debugLoopCounter%DEBUG_LOOP)){
     if (pumpStatus) Serial.print("Pump: ON");
     else Serial.print("Pump: OFF");
-    if(overMax) Serial.print("\tFULL");
-    else if (midLevel) Serial.print("\tMID LEVEL");
-    else Serial.print("\tUNDER MIN");
-    Serial.print("\t");
+    if(overMax) Serial.print("  FULL");
+    else if (midLevel) Serial.print("  MID LEVEL");
+    else Serial.print("  UNDER MIN");
+    Serial.print("  ");
+    Serial.print(getSensorMin());
+    Serial.print("  ");
+    Serial.print(getSensorMax());
+    Serial.print("  ");
     Serial.print(analogRead(SENSOR_MIN));
-    Serial.print("\t");
+    Serial.print("  ");
     Serial.println(analogRead(SENSOR_MAX));
-  }
-  debugLoopCounter++;
 }
 
 // *************************************************** SETUP *********************************************************************
@@ -286,26 +313,31 @@ void setup() {
   pinMode(SENSOR_MIN, INPUT);
   pinMode(SENSOR_MAX, INPUT);
   pinMode(SENSOR_5V, OUTPUT);
+  pinMode(RELE_5V, OUTPUT);
   pinMode(RELE, OUTPUT);
 
   digitalWrite(SENSOR_5V, HIGH);
-  digitalWrite(RELE, HIGH);
+  digitalWrite(RELE_5V, HIGH);
   
-  delay(1500);
+  delay(500);
   Serial.println("Device started");
   loadData();
+  showData();
   serialUpdate();
-  pumpStatus = true;
   saveLoopCounter=0;
   debugLoopCounter=0;
-  updateData();
+  lastRuntime=millis();
+  Serial.print("Counter is running on day ");
+  Serial.println(date);
+  pumpON();
 }
 
 // *************************************************** LOOP **********************************************************************
 
 void loop() {
-  //automatic();
- // updateData();
-  //serialDebug();
-  Serial.println(analogRead(SENSOR_MIN));
+  automatic();
+  if (!(debugLoopCounter%DEBUG_LOOP)&& debugDisplay)serialDebug();
+  debugLoopCounter++;
+  if(!(saveLoopCounter%SAVE_LOOP))updateData();
+  saveLoopCounter++;
 }
