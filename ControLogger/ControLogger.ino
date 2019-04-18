@@ -1,5 +1,5 @@
-#include "oledHandler.h"
-#include <EEPROM.h>
+#include "DISPLAYhandler.h"
+#include "EEPROMhandler.h"
 
 // PIN IDs ******************************************************************************************************************************
 
@@ -14,12 +14,10 @@
 #define SCL             A5
 #define OLED_ENABLE     7
 #define RELE            8
-#define OLED_RESET      9
 
 // PARAMETERS 36000000 ******************************************************************************************************************
 
 #define MENU_TIMEOUT 8000
-#define MIN_DAILYRUNTIME 36000000
 #define CORE_LOOP 100
 #define SAVE_LOOP 1000
 #define CHAR_WIDTH 5
@@ -27,34 +25,28 @@
 
 // DATA TYPES AND CONSTANTS *************************************************************************************************************
 
-struct day{
+/*struct day{
   unsigned long activeTime;
   float litres;
-};
-enum orientation {center, down, up, right, left};
-enum page {off = 0, mainW = 1, mainM = 2, viewD = 3, configM = 4,  configFlow = 5, configCond = 6, configComp = 7, resetM = 8};
+}; */
 enum level {underMin, overMax, midLevel};
-
-const byte itemsPerPage [] = {0, 0, 4, 0, 4, 1, 2, 1, 2};    // Número de elementos por página
-const byte line[] = {0, 15, 30, 45, 60};
-const byte lineMenu [] = {0, 10, 16, 32, 48, 64};
 
 // GLOBAL VARIABLES DECLARATIONS *******************************************************************************************************
 
-OledHandler oled();
-
-page window, prevWindow;
-byte menuItem, prevMenuItem;
 volatile bool buttonWasPressed;
 volatile char rotationEncoder;
 
 bool switchMode, switchPump, pumpStatus;                // Switch Mode 1 = Auto; 0 = Manual
 level waterLevel;
-byte date, limitMin, limitMax, controlMin, controlMax;
+byte date, controlMin, controlMax;
+int limitMin, limitMax;
 unsigned long dailyRuntime;
 unsigned long timeLastAction;
 float flow, totalLitres;                                // Flow is in L/min
 struct day today;
+
+DISPLAYhandler oled;
+EEPROMhandler memory(&oled, &flow, &limitMin, &limitMax, &controlMin, &controlMax, &date, &dailyRuntime, &totalLitres, &today);
 
 // SETUP *******************************************************************************************************************************
 
@@ -67,35 +59,32 @@ void setup() {
   pinMode(ENCODER_A, INPUT);
   pinMode(ENCODER_A, INPUT);
   
-  attachInterrupt(digitalPinToInterrupt(ENCODER_CLK), pushEncoder, FALLING);
-  attachInterrupt(digitalPinToInterrupt(ENCODER_A), rotateEncoder, FALLING);
+//  attachInterrupt(digitalPinToInterrupt(ENCODER_CLK), pushEncoder, FALLING);
+//  attachInterrupt(digitalPinToInterrupt(ENCODER_A), rotateEncoder, FALLING);
 
   pinMode(SWITCH_MODE, INPUT_PULLUP);
   pinMode(SWITCH_PUMP, INPUT_PULLUP);
 
   pinMode(OLED_ENABLE, OUTPUT);
   digitalWrite(OLED_ENABLE, HIGH);
-
-  loadParamEEPROM();
-  loadDataEEPROM();
   
-  buttonWasPressed = false;
+  /*buttonWasPressed = false;
   timeLastAction = dailyRuntime;
   window = mainW;
   prevWindow = off;
   menuItem = 1;
-  prevMenuItem = 0;
+  prevMenuItem = 0;*/
 
-  oled.mainWindow();
+  //mainWindow();
 }
 
 // LOOP ***********************************************************************************************************************************
 
 void loop() {
-  checkInteractionGUI();
-  checkSwitchMode();
-  if (switchMode) controlCore(true);
-  else controlCore(false);
-  countDownSleep();
+  //checkInteractionGUI();
+  //checkSwitchMode();
+  //if (switchMode) controlCore(true);
+  //else controlCore(false);
+  //countDownSleep();
 }
 
