@@ -1,8 +1,12 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+using namespace std;
+
+#include <Arduino.h>
+
 #define Sprint(x)       (Serial.print(F(x)))      //Usar solo para cadenas de caracteres ESTÁTICAS Y NO VACÍAS
-#define Sprintln(x)     (Serial.println(F(x)))    //Usar solo para cadenas de caracteres ESTÁTICAS Y NO VACÍAS
+#define Sprintln(x)     (Serial.println(F(x)))
 
 #define DEBUG(x) {Serial.print(#x); Sprint(" = "); Serial.println(x);}
 /* Macro que imprime por Serial el nombre y valor de la variable x.

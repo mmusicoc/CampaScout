@@ -1,7 +1,5 @@
 #include "4-Sensors.hpp"
 
-using namespace std;
-
 // SENSOR CLASS **********************************************************************************************************************************
 
 void Sensor::setSensorChecks(int newChecks){
@@ -48,7 +46,7 @@ void SwitchesClass::updateSwitches() {
   for (byte i = 0; i < SWITCH_COUNT; i++) {
     switchesPrev[i] = switches_[i];
     switches_[i] = !sensorUpdate(switchPins_[i], sensorChecks_);
-    if ((switchesPrev[i] != switches_[i]) && serial) {
+    if (switchesPrev[i] != switches_[i]) {
       Sprint("Switch B");
       Serial.print(i + 1);
       Sprint(" = ");
@@ -72,21 +70,17 @@ void WaterLevelSensor::updateWaterLevel() {         // Función que asigna a la 
   level prevLevel = waterLevel_;
   if (sensorMax) {
     waterLevel_ = overMax;
-    if (serial && (waterLevel_ != prevLevel)) Sprintln("OVER MAX");
+    if (waterLevel_ != prevLevel) Sprintln("OVER MAX");
   } else if (sensorMin) {                           // En caso contrario, si la función "getSensorMin()" da positivo,
     waterLevel_ = midLevel;                         // el agua está por encima del sensor inferior, pero por debajo del superior: está a media altura.
-    if (serial && (waterLevel_ != prevLevel)) Sprintln("MIDDLE LEVEL");
+    if (waterLevel_ != prevLevel) Sprintln("MIDDLE LEVEL");
   } else {                                          // Si no es ninguno de los casos anteriores, no queda más remedio que el bidón esté vacío y haya que rellenarlo.
     waterLevel_ = underMin;
-    if (serial && (waterLevel_ != prevLevel)) Sprintln("UNDER MIN");
+    if (waterLevel_ != prevLevel) Sprintln("UNDER MIN");
   }
 }
 
 // FLOWMETER CLASS ***************************************************************************************************************************
-
-FlowmeterClass::FlowmeterClass(){
-  flowCounts_ = 0;
-}
 
 volatile int FlowmeterClass::flowCounts_;
 
@@ -96,7 +90,7 @@ void FlowmeterClass::init() {
 }
 
 float FlowmeterClass::getWaterFlow(){
-  float waterFlow = flowRate_ * flowCounts_;
+  float waterFlow = flowCounts_ / (float)flowRate_;
   flowCounts_ = 0;
   return waterFlow;
 }
@@ -105,8 +99,4 @@ void FlowmeterClass::setFlowRate(int newFloatRate){
   flowRate_ = newFloatRate;
   Sprint("Water flowmeter pulses/litre are now ");
   Serial.println(flowRate_);
-}
-
-void FlowmeterClass::flowISR(){
-  flowCounts_++;
 }

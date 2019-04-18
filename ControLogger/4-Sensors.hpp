@@ -48,7 +48,7 @@ class WaterLevelSensor : public Sensor {
 
 class FlowmeterClass {
   public:
-    FlowmeterClass();
+    FlowmeterClass() {flowCounts_ = 0;}
     void init();
     float getWaterFlow();
     int getFlowRate() {return flowRate_;}
@@ -57,7 +57,7 @@ class FlowmeterClass {
   private:
     static volatile int flowCounts_;
     int flowRate_;                          // Pulsos por cada litro de agua que haya circulado por el caudalímetro
-    static void flowISR();
+    static void flowISR() {flowCounts_++;}
 };
 
 #endif
