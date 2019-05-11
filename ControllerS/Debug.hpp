@@ -1,34 +1,60 @@
-#ifndef DEBUG_H
-#define DEBUG_H
+// Debugging tools made by OGL and MMC
+ 
+#ifndef _DEBUG_H
+#define _DEBUG_H
 
-#define DEBUG(x) if (debug_) {Serial.print(#x); Serial.print(" = "); Serial.println(x);}
-/* Macro que imprime por Serial el nombre y valor de la variable x.
-   Ejemplo:
-     int x = 45;
-     DEBUG(x)
-   Por serial pondría -> x = 45
-*/
+#include <Arduino.h>
 
-#define LIN if (debug_) {Serial.print("Reached line No. "); Serial.println(__LINE__);}
-/* Macro que imprime por Serial la línea en la que se encuentra.
-   Ejemplo:
-      BRK
-   Por serial pondría -> Reached line No.15
-*/
-
-#define FCN if (debug_) {Serial.print("Executed function \""); Serial.print(__FUNCTION__); Serial.println("\"");}
-/* Macro que imprime por Serial la función que está ejecutando en ese momento.
-   Ejemplo:
-      void funcionA(){
-      [...]
-      FCN
-      }
-   Por serial pondría -> Executed function "funcionA"
-*/
-
-#define STOP if (debug_) {BRK delay(10); exit(0);}
-/* Macro que para instantáneamente la ejecución del programa, pero antes imprime por Serial la línea en la que se encuentra.
-   Si se activa un interrupt, puede ejecutarse la función ISR y al terminarla vuelve al reposo.
-*/
-
+#ifdef Arduino_h
+  #define Sprint(x)       (Serial.print(F(x)))      //Usar solo para cadenas de caracteres ESTÁTICAS Y NO VACÍAS
+  #define Sprintln(x)     (Serial.println(F(x)))
 #endif
+
+#undef DEBUG(x)
+#define DEBUG(x) Serial.println(String(#x) + " = " + String(x))
+/* Prints to serial the name and value of the given variable.
+ * Example:
+ *   [...]
+ *   int a = 45;
+ *   [...]
+ *   DEBUG(a);
+ *   [...]
+ *   
+ * >> Serial Monitor: a = 45
+*/
+
+#undef DEBUGLIN
+#define DEBUGLIN Serial.println("Code executed line #" + String(__LINE__)) + " in file \"" + String(__FILE__) + "\"")
+/* Prints to serial the line number and filename in which the macro is placed.
+ * Example:
+ *   [...]
+ *   DEBUGLIN;
+ *   [...]
+ * 
+ * >> Serial monitor: Code executed line #35 in file "debug.h"
+*/
+
+#undef DEBUGBRK
+#define DEBUGBRK { Serial.println("Code reached line #" + String(__LINE__)) + " in file \"" + String(__FILE__) + "\" and stopped."); delay(10); exit(0) }
+/*  Same as DEBUGLIN but stopping execution of code. Interruptions remain serviceable.
+ *  Example:
+ *    [...]
+ *    DEBUGBRK;
+ *    [...]
+ *  
+ *  >> Serial Monitor: Code reached line #45 in file "debug.h" and stopped.
+ */
+
+#undef DEBUGFCN
+#define DEBUGFCN Serial.println("Code execution is in function \"" + String(__FUNCTION__)) + "\" in file \"" + String(__FILE__) + "\"")
+/* Same as DEBUGLIN but printing function instead of line
+ * Example:
+ *   void func(){
+ *     [...]
+ *     DEBUGFCN;
+ *     [...]
+ *   }
+ * >> Serial monitor: Code execution is in function "func" in file "debug.h"
+*/
+ 
+#endif // _DEBUG_H
