@@ -26,8 +26,8 @@ void SerialHandler::serialWatchDog(){   // Función que permite actualizar los p
   if (Serial.available()){                              // Si hemos enviado algo, significa que queremos cabiar algún parámetro
     String command = Serial.readString();
     Sprint("\n");
-    if (command.equalsIgnoreCase("CHECKS")) updateChecks();
-    else if (command.equalsIgnoreCase("LIMIT")) updateLimits();
+    if (command.equals("checks")) updateChecks();
+    else if (command.equals("limit")) updateLimits();
     else {
       Sprint("Error, command \"");
       Serial.print(command);

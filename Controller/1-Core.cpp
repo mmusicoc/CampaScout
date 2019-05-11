@@ -20,9 +20,11 @@ void ControllerCore::updateSerial(SerialHandler &USB) {
   if (newChecks != WaterLS.getSensorChecks()){
     Switches.setSensorChecks(newChecks);
     WaterLS.setSensorChecks(newChecks);
+    EEPROM.put(MEM_CHECKS, newChecks);
   }
   if (newLimit != WaterLS.getSensorLimit()){
     WaterLS.setSensorLimit(newLimit);
+    EEPROM.put(MEM_LIMIT, newLimit);
   }
   openTime = 0;
 }

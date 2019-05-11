@@ -1,6 +1,7 @@
 #ifndef CONTROLLER_STATUS_H
 #define CONTROLLER_STATUS_H
 
+#include <EEPROM.h>
 #include "0-Params.hpp"
 #include "2-Serial.hpp"
 #include "4-Sensors.hpp"

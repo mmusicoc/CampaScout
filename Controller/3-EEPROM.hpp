@@ -4,17 +4,14 @@
 #include "0-Params.hpp"
 #include <EEPROM.h>
 
-class EEPROMHandler {
-  public:
-    EEPROMHandler();
-    void init();
-    void loadParam(int* checks, int* limit);
-    void saveParam(int checks, int limit);
-    void read();
-    void printEvent();
 
-  private:
-  
+
+class EEPROMhandler {
+  public:
+    EEPROMhandler(){};
+    void loadParam(int* checks, int* limit);
+    void saveChecks(int checks);
+    void saveLimit(int limit);
 };
 
 #endif

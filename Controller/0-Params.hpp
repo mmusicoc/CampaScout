@@ -3,7 +3,9 @@
 
 #include "Debug.hpp"
 
-#define RESET_RTClock   false               // Timestamps compilation date & time to RTC module, make false except when resetting!!
+// EEPROM PATHS - Direcciones de memoria donde se guardan los parámetros para que cada vez que se inicie el Arduino se carguen
+#define MEM_CHECKS 0                                              // int
+#define MEM_LIMIT MEM_CHECKS + sizeof(int)                        // int
 
 // Parámetros del programa
 #define BAUDRATE        9600
