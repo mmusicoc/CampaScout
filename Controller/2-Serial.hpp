@@ -1,6 +1,7 @@
 #ifndef SERIAL_HANDLER_H
 #define SERIAL_HANDLER_H
 
+#include <EEPROM.h>
 #include "0-Params.hpp"
 
 class SerialHandler {

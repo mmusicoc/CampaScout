@@ -11,9 +11,9 @@ class Sensor {
     Sensor() {}
     virtual void init() = 0;
     int getSensorChecks() {return sensorChecks_;}
-    void setSensorChecks(int newChecks);
+    void setSensorChecks(int newChecks) {sensorChecks_ = newChecks;}
     int getSensorLimit() {return sensorLimit_;}
-    void setSensorLimit(int newLimit);
+    void setSensorLimit(int newLimit) {sensorLimit_ = newLimit;}
 
 
   protected:

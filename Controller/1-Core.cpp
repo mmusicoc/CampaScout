@@ -14,19 +14,21 @@ void ControllerCore::updateStatus() {
 }
 
 void ControllerCore::updateSerial(SerialHandler &USB) {
-  static bool openTime = 1;
   int newChecks = USB.getNewChecks();
   int newLimit = USB.getNewLimit();
   if (newChecks != WaterLS.getSensorChecks()){
     Switches.setSensorChecks(newChecks);
     WaterLS.setSensorChecks(newChecks);
     EEPROM.put(MEM_CHECKS, newChecks);
+    Sprint("Sensor checks are now ");
+    Serial.println(newChecks);
   }
   if (newLimit != WaterLS.getSensorLimit()){
     WaterLS.setSensorLimit(newLimit);
     EEPROM.put(MEM_LIMIT, newLimit);
+    Sprint("Sensibility threshold is now ");
+    Serial.println(newLimit);
   }
-  openTime = 0;
 }
 
 void ControllerCore::pumpCore() {

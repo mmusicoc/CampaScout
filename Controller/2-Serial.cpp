@@ -11,15 +11,14 @@ void SerialHandler::serialWelcome(){
     commands();
   } else Serial.end();
   Sprintln("Default parameters were loaded:");
-  newChecks_ = DEF_CHECKS;
-  newLimit_ = DEF_LIMIT;
+  EEPROM.get(MEM_CHECKS, newChecks_);
+  EEPROM.get(MEM_LIMIT, newLimit_);
 }
 
 void SerialHandler::commands(){
   Sprintln("Send a command anytime:");
-  Sprintln("   CHECKS: number of signal stability checks");
-  Sprintln("   LIMIT: min threshold for sensor validation");
-  Sprintln("   FLOW: number of flowmeter pulses per litre");
+  Sprintln("   checks: number of signal stability checks");
+  Sprintln("   limit: min threshold for sensor validation");
 }
 
 void SerialHandler::serialWatchDog(){   // Función que permite actualizar los parámetros de los sensores

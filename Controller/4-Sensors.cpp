@@ -2,18 +2,6 @@
 
 // SENSOR CLASS **********************************************************************************************************************************
 
-void Sensor::setSensorChecks(int newChecks){
-  sensorChecks_ = newChecks;
-  Sprint("Sensor checks are now ");
-  Serial.println(sensorChecks_);
-}
-
-void Sensor::setSensorLimit(int newLimit){
-  sensorLimit_ = newLimit;
-  Sprint("Sensibility threshold is now ");
-  Serial.println(sensorLimit_);
-}
-
 bool Sensor::sensorUpdate(uint8_t pin, byte control, int limit) {
   byte valido = 0;
   for (byte i = 0; i < control; i++) {              // Hace "control" lecturas para asegurarse de que no hay falsas señales.
@@ -65,8 +53,8 @@ void WaterLevelSensor::init() {
 }
 
 void WaterLevelSensor::updateWaterLevel() {         // Función que asigna a la variable waterLevel el estado del depósito.
-  bool sensorMin = sensorUpdate(SENSOR_MIN, sensorChecks_, sensorLimit_);
-  bool sensorMax = sensorUpdate(SENSOR_MAX, sensorChecks_, sensorLimit_);
+  bool sensorMin = !sensorUpdate(SENSOR_MIN, sensorChecks_, sensorLimit_);
+  bool sensorMax = !sensorUpdate(SENSOR_MAX, sensorChecks_, sensorLimit_);
   level prevLevel = waterLevel_;
   if (sensorMax) {
     waterLevel_ = overMax;
