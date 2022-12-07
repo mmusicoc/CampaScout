@@ -6,7 +6,7 @@
 #include <Arduino.h>
 
 #ifdef Arduino_h
-  #define Sprint(x)       (Serial.print(F(x)))      //Usar solo para cadenas de caracteres ESTÁTICAS Y NO VACÍAS
+  #define Sprint(x)       (Serial.print(F(x)))      // Use apenas para strings ESTÁTICAS E NÃO VAZIAS
   #define Sprintln(x)     (Serial.println(F(x)))
 #endif
 

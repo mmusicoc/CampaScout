@@ -1,9 +1,9 @@
 #include "2-Serial.hpp"
 
 void SerialHandler::init() {
-  Serial.begin(BAUDRATE);                               // Activación del puerto
-  delay(500);                                           // Pausa para que se establezca la conexión                                  
-  if(serial_ = Serial) Sprintln("Device started!");     // Si no detecta a nadie escuchando, desactiva el puerto y omite las funciones de serial que más consuman
+  Serial.begin(BAUDRATE);                               // Ativação da porta
+  delay(500);                                           // Pausa para conexão ser estabelecida                                  
+  if(serial_ = Serial) Sprintln("Device started!");     // Se não detectar nenhum barulho, desabilita a porta e pula as funções seriais que consomem mais
 }
 
 void SerialHandler::serialWelcome(){
@@ -21,8 +21,8 @@ void SerialHandler::commands(){
   Sprintln("   limit: min threshold for sensor validation");
 }
 
-void SerialHandler::serialWatchDog(){   // Función que permite actualizar los parámetros de los sensores
-  if (Serial.available()){                              // Si hemos enviado algo, significa que queremos cabiar algún parámetro
+void SerialHandler::serialWatchDog(){   // Função que permite atualizar os parâmetros dos sensores
+  if (Serial.available()){                              // Se enviamos algo, significa que queremos alterar algum parâmetro
     String command = Serial.readString();
     Sprint("\n");
     if (command.equals("checks")) updateChecks();

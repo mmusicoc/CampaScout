@@ -5,17 +5,17 @@
 SerialHandler USB;
 ControllerCore Core;
 
-void setup() {                            // Esta es la rutina estándar que se ejecuta cuando se reinicia el Arduino, es OBLIGATORIA.
-  USB.init();                             // Llama a la función que inicia el puerto serial de transmisión de datos,
+void setup() {                            // Esta é a rotina padrão que é executada quando o Arduino é reinicializado, é OBRIGATÓRIA.
+  USB.init();                             // Chama a função que inicia a porta serial para transmissão de dados.
   Core.init();
-  USB.serialWelcome();                    // Si el puerto está habilitado, envía el menú de configuración a la consola serial.
+  USB.serialWelcome();                    // Se a porta estiver habilitada, ela envia o menu de configuração para o console serial.
 }
 
-void loop() {                             // Una vez terminada la rutina "setup()", se ejecuta "loop()" indefinidamente hasta que se apague el Arduino.
+void loop() {                             // Terminada a rotina "setup()", o "loop()" é executado indefinidamente até que o Arduino seja desligado.
   if (USB.available()){
-    USB.serialWatchDog();                 // Rutina que controla si se ha enviado algo al puerto serial.
-    Core.updateSerial(USB);               // Si se ha enviado petición de cambio de algún parámetro, cursa su actualización y guardado en tarjeta SD.
+    USB.serialWatchDog();                 // Rotina que verifica se algo foi enviado para a porta serial.
+    Core.updateSerial(USB);               // Se uma solicitação para alterar um parâmetro foi enviada, atualize-a e salve-a no cartão SD.
   }
-  Core.updateStatus();                    // Dependiendo del estado del botón Auto/Manual, ejecuta la función principal de un modo distinto.
-  delay(LOOP_DELAY);                      // Una pausa de DELAY_LOOP milisegundos para que no haga tantos bucles y gaste menos energía.
+  Core.updateStatus();                    // Dependendo do estado do botão Auto/Manual, ele executa a função principal de forma diferente.
+  delay(LOOP_DELAY);                      // Uma pausa de milissegundos DELAY_LOOP para que não faça muitos loops e use menos energia.
 }
