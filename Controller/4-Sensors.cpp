@@ -1,32 +1,32 @@
 #include "4-Sensors.hpp"
 
-// SENSOR CLASS **********************************************************************************************************************************
+// CLASSE DO SENSOR **********************************************************************************************************************************
 
 bool Sensor::sensorUpdate(uint8_t pin, byte control, int limit) {
   byte valido = 0;
-  for (byte i = 0; i < control; i++) {              // Hace "control" lecturas para asegurarse de que no hay falsas señales.
-    if (analogRead(pin) >= limit) valido++;         // Si la señal en "pin" es mayor o igual que "limit", anota la lectura como válida.
-    delayMicroseconds(READ_DELAY);                  // Deja un intervalo de tiempo entre lecturas para que la señal se estabilice.
+  for (byte i = 0; i < control; i++) {              // Ele verifica as leituras para garantir que não haja sinais falsos.
+    if (analogRead(pin) >= limit) valido++;         // Se o sinal no "pino" for maior ou igual ao "limite", anote a leitura como válida.
+    delayMicroseconds(READ_DELAY);                  // Deixa um intervalo de tempo entre as leituras para que o sinal se estabilize.
   }
-  if (valido == control) return true;               // Si todas las lecturas han dado el mismo resultado satisfactorio,
-  else return false;                                // entonces confirma que la lectura es AFIRMATIVO (sin sentido físico).
+  if (valido == control) return true;               // Se todas as leituras tiverem dado o mesmo resultado satisfatório.
+  else return false;                                // Então confirma que a leitura é AFIRMATIVA (sem significado físico).
 }
 
 bool Sensor::sensorUpdate(uint8_t pin, byte control) {
   byte valido = 0;
   for (byte i = 0; i < control; i++) {
-    if (digitalRead(pin) == HIGH) valido++;         // Si la señal digital es "HIGH", anota la lectura como válida.
+    if (digitalRead(pin) == HIGH) valido++;         // Se o sinal digital for "ALTO", anote a leitura como válida.
     delayMicroseconds(READ_DELAY);
   }
   if (valido == control) return true;
   else return false;
 }
 
-// SWITCHES CLASS ******************************************************************************************************************************
+// CLASSE DOS INTERRUPTORES ******************************************************************************************************************************
 
 void SwitchesClass::init() {
   for (byte i = 0; i < SWITCH_COUNT; i++) pinMode(switchPins_[i], INPUT_PULLUP);
-  // Para los interruptores, los pines tendrán 2 posibles estados: +5V o flotante, y éste se fuerza a un estado conocido con el modo INPUT_PULLUP.
+  // Para interruptores, os pinos terão 2 estados possíveis: +5V ou flutuante, e isso é forçado a um estado conhecido com o modo INPUT_PULLUP.
 }
 
 void SwitchesClass::updateSwitches() {
@@ -45,24 +45,24 @@ void SwitchesClass::updateSwitches() {
   }
 }
 
-// WATER LEVEL SENSOR CLASS *******************************************************************************************************************
+// CLASSE DE SENSOR DE NÍVEL DE ÁGUA *******************************************************************************************************************
 
 void WaterLevelSensor::init() {
   pinMode(SENSOR_MIN, INPUT);
   pinMode(SENSOR_MAX, INPUT);
 }
 
-void WaterLevelSensor::updateWaterLevel() {         // Función que asigna a la variable waterLevel el estado del depósito.
+void WaterLevelSensor::updateWaterLevel() {         // Função que atribui o estado do tanque à variável waterLevel.
   bool sensorMin = !sensorUpdate(SENSOR_MIN, sensorChecks_, sensorLimit_);
   bool sensorMax = !sensorUpdate(SENSOR_MAX, sensorChecks_, sensorLimit_);
   level prevLevel = waterLevel_;
   if (sensorMax) {
     waterLevel_ = overMax;
     if (waterLevel_ != prevLevel) Sprintln("OVER MAX");
-  } else if (sensorMin) {                           // En caso contrario, si la función "getSensorMin()" da positivo,
-    waterLevel_ = midLevel;                         // el agua está por encima del sensor inferior, pero por debajo del superior: está a media altura.
+  } else if (sensorMin) {                           // Caso contrário, se a função "getSensorMin()" retornar positivo.
+    waterLevel_ = midLevel;                         // A água está acima do sensor inferior, mas abaixo do superior: está na metade.
     if (waterLevel_ != prevLevel) Sprintln("MIDDLE LEVEL");
-  } else {                                          // Si no es ninguno de los casos anteriores, no queda más remedio que el bidón esté vacío y haya que rellenarlo.
+  } else {                                          // Se não for nenhum dos casos acima, não resta outra opção senão o tambor estar vazio e ele deve ser recarregado.
     waterLevel_ = underMin;
     if (waterLevel_ != prevLevel) Sprintln("UNDER MIN");
   }

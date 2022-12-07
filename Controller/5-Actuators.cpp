@@ -1,6 +1,6 @@
 #include "5-Actuators.hpp"
 
-// LEDs CLASS ******************************************************************************************************************************
+// LEDs  ******************************************************************************************************************************
 
 void LEDsClass::init(){
   for (int i = 0; i < LED_COUNT; i++) {
@@ -34,21 +34,21 @@ void LEDsClass::LEDblink(uint8_t LEDpin){
   }
 }
 
-// PUMP CLASS ******************************************************************************************************************************
+// BOMBA ******************************************************************************************************************************
 
 void PumpClass::init(){
   pinMode(RELAY, OUTPUT);
   digitalWrite(RELAY, LOW);
 }
 
-void PumpClass::pumpON(LEDsClass &LEDs){     // Función de encendido de la bomba.
-  digitalWrite(RELAY, RELAY_ON);             // Pone el relé en la posición de activado (configurar en Parameters.hpp
-  pumpStatus_ = true;                        // Guarda en la variable el nuevo estado de la bomba.
-  Sprintln("Pump ON");                       // Si el puerto serial está habilitado, envía un mensaje informativo.
+void PumpClass::pumpON(LEDsClass &LEDs){     // Função de arranque da bomba.
+  digitalWrite(RELAY, RELAY_ON);             // Coloca o relé na posição energizada (configurar em Params.hpp)
+  pumpStatus_ = true;                        // Salva o novo estado da bomba na variável.
+  Sprintln("Pump ON");                       // Se a porta serial estiver habilitada, ela envia uma mensagem informativa.
   LEDs.setLED(4, blinky);
 }
 
-void PumpClass::pumpOFF(LEDsClass &LEDs){    // Mismo algoritmo que "pumON()", pero a la inversa.
+void PumpClass::pumpOFF(LEDsClass &LEDs){    // Mesmo algoritmo de "pumON()", mas ao contrário.
   digitalWrite(RELAY, RELAY_OFF);
   pumpStatus_ = false;
   Sprintln("Pump OFF");

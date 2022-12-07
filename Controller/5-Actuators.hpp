@@ -4,7 +4,7 @@
 #include "0-Params.hpp"
 #include "4-Sensors.hpp"
 
-typedef enum LedState {off = 0, on = 1, blinky = 2} LEDstate;           // Definición de tipos de estado posibles para un LED.
+typedef enum LedState {off = 0, on = 1, blinky = 2} LEDstate;           // Definição dos possíveis tipos de estado para um LED.
 
 class PumpClass;
 
@@ -30,7 +30,7 @@ class PumpClass{
     void pumpOFF(LEDsClass &LEDs);
 
   private:
-    bool pumpStatus_;                       // Guarda el estado actual de la bomba de llenado.
+    bool pumpStatus_;                       // Salva o estado atual da bomba de enchimento.
 };
 
 #endif

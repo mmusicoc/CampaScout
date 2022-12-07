@@ -4,7 +4,7 @@
 #include "0-Params.hpp"
 #include "2-Serial.hpp"
 
-typedef enum Level {underMin = 0, midLevel = 1, overMax = 2} level;     // Definición de tipos de estado posibles para el nivel de agua.
+typedef enum Level {underMin = 0, midLevel = 1, overMax = 2} level;     // Definição de possíveis tipos de estado para o nível de água.
 
 class Sensor {
   public:
@@ -19,8 +19,8 @@ class Sensor {
   protected:
     int sensorChecks_;
     int sensorLimit_;
-    bool sensorUpdate(uint8_t pin, byte control, int limit);  // Función que toma lecturas y hace las comparaciones, en modo analógico.
-    bool sensorUpdate(uint8_t pin, byte control);             // Función que toma lecturas y hace las comparaciones, en modo digital.
+    bool sensorUpdate(uint8_t pin, byte control, int limit);  // Função que faz leituras e comparações, em modo analógico.
+    bool sensorUpdate(uint8_t pin, byte control);             // FFunção que faz leituras e comparações, em modo digital.
 };
 
 class SwitchesClass : public Sensor {
@@ -43,7 +43,7 @@ class WaterLevelSensor : public Sensor {
     level getWaterLevel() {return waterLevel_;}
 
   private:
-    level waterLevel_;                      // Variable de tipo level que guarda el estado actual del nivel de agua en el depósito.
+    level waterLevel_;                      // Variável do tipo nível que armazena o estado atual do nível de água no tanque.
 };
 
 #endif

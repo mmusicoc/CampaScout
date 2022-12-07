@@ -8,7 +8,7 @@ class SerialHandler {
   public:
     SerialHandler() {}
     void init();
-    bool available() {return serial_;}    // Guarda si está disponible y habilitado el puerto serial para transmisión de datos. Enviará mensajes.
+    bool available() {return serial_;}    // Salva a porta serial para transmissão de dados. Se estiver disponível e habilitada, ele enviará mensagens.
     void serialWelcome();
     void serialWatchDog();
     int getNewChecks() {return newChecks_;}
